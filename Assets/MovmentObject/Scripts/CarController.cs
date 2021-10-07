@@ -15,6 +15,11 @@ public class CarController : MonoBehaviour
     public int countCar = 10;
     public int countClone = 3;
 
+    public GameObject sphere;
+    public Material correctAnswer;
+    public Material wrongAnswer;
+    public Material noneAnswer;
+
     int [] allIndexCars = null;
 
     List<GameObject> allObject = new List<GameObject>();
@@ -67,6 +72,12 @@ public class CarController : MonoBehaviour
 
         }
 
+        Vector3 panelTrans = panel.transform.position;
+        ////sphere = Instantiate(indicationAnswers, indicationAnswers.transform.position, Quaternion.identity);
+        sphere.transform.parent = panel.transform;
+        sphere.transform.position = new Vector3(panelTrans.x, panelTrans.y, panelTrans.z + 15);
+        refreshSphere();
+
         spavnObject();
 
         //GameObject cube = Instantiate(allCars[0], allCars[0].transform.position, Quaternion.identity);
@@ -111,10 +122,12 @@ public class CarController : MonoBehaviour
             n++;
         }
 
+        allIndexCars = ShuffleArray(allIndexCars);
+
         for (int i = 0; i < countClone; i++)
         {
-            allObjectCars[i].transform.position = new Vector3(panel.position.x, panel.position.y, panel.position.z + 40 + (i * distance));
-            queueÑars.Add(allObjectCars[i]);
+            allObjectCars[allIndexCars[i]].transform.position = new Vector3(panel.position.x, panel.position.y, panel.position.z + 40 + (i * distance));
+            queueÑars.Add(allObjectCars[allIndexCars[i]]);
         }
     }
 
@@ -132,36 +145,53 @@ public class CarController : MonoBehaviour
         //car.GetComponent<PathCreation.Examples.PathFollower>().distance = distance;
         //car.GetComponent<PathCreation.Examples.PathFollower>().numStep = numStep;
         //allObject.Add(car);
-        
 
-        Debug.Log("Size count allObjectCars: " + allObjectCars.Count);
+        //Debug.Log("Size count allObjectCars: " + allObjectCars.Count);
         int rand = Random.Range(0, allObjectCars.Count);
         while (queueÑars.Contains(allObjectCars[rand]))
         {
-            Debug.Log(allObjectCars[rand].name + " Óæå åñòü â î÷åðåäè!");
+            //Debug.Log(allObjectCars[rand].name + " Óæå åñòü â î÷åðåäè!");
             rand = Random.Range(0, allObjectCars.Count);
         }
 
         
         queueÑars.RemoveAt(0);
 
+
+        //allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().endOfPathInstruction = PathCreation.EndOfPathInstruction.Loop;
+        //Debug.Log(PathCreation.EndOfPathInstruction.Loop);
+        //allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().pathCreator = path_1;
+        //allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().pathCreator = null;
+        //allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().endOfPathInstruction = endOfPathInstruction;
+        //Debug.Log(endOfPathInstruction);
         //GameObject car = allObjectCars[rand];
-        
+
         allObjectCars[rand].transform.position = new Vector3(panel.position.x, panel.position.y, panel.position.z + 40 + ((countClone - 1) * distance));
         allObjectCars[rand].transform.rotation = Quaternion.Euler(0.0f, 90f, 0.0f);
-       
+        allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().reloadDistance();
         allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().pathCreator = null;
         allObjectCars[rand].GetComponent<PathCreation.Examples.PathFollower>().endOfPathInstruction = endOfPathInstruction;
 
         queueÑars.Add(allObjectCars[rand]);
-        Debug.Log(allObjectCars[rand].name);
-        Debug.Log("Pocition: " + allObjectCars[rand].transform.position.x.ToString() + " " + allObjectCars[rand].transform.position.z.ToString());
-        Debug.Log(queueÑars[0].name);
+        //Debug.Log(allObjectCars[rand].name);
+        //Debug.Log("Pocition: " + allObjectCars[rand].transform.position.x.ToString() + " " + allObjectCars[rand].transform.position.z.ToString());
+        //Debug.Log(queueÑars[0].name);
+    }
+
+    public void checkResult(int num)
+    {
+        switch (num)
+        {
+            case 0: moveRight(); break;
+            case 1: moveLeft(); break;
+        }
     }
 
     void moveRight()
     {
         Debug.Log("Queue size: " + queueÑars.Count.ToString());
+        Debug.Log("Right");
+        checkCar(rightObject);
         //Debug.Log(queueÑars[0].name);
         if (queueÑars.Count > 0)
         {
@@ -170,12 +200,15 @@ public class CarController : MonoBehaviour
             {
                 queueÑars[i].GetComponent<PathCreation.Examples.PathFollower>().moveCar();
             }
-            addCar();        }
+            addCar();       
+        }
     }
 
     void moveLeft()
     {
         Debug.Log("Queue size: " + queueÑars.Count.ToString());
+        Debug.Log("Left");
+        checkCar(leftObject);
         //Debug.Log(queueÑars[0].name);
         if (queueÑars.Count > 0)
         {
@@ -187,16 +220,7 @@ public class CarController : MonoBehaviour
             addCar();
         }
     }
-    
-
-    public void checkResult(int num)
-    {
-        switch (num)
-        {
-            case 0: moveRight(); break;
-            case 1: moveLeft(); break;
-        }
-    }
+   
 
     private int[] ShuffleArray(int[] numbers)
     {
@@ -209,5 +233,60 @@ public class CarController : MonoBehaviour
             newArray[r] = tmp;
         }
         return newArray;
+    }
+
+    void checkRightCar()
+    {
+        Debug.Log(queueÑars[0].name);
+        foreach (GameObject obj in rightObject)
+        {
+            if (queueÑars[0].name.Contains(obj.name))
+            {
+                Debug.Log(obj.name);
+                Debug.Log("Good!");
+                return;
+            }
+        }
+        Debug.Log("Loos!");
+    }
+
+    void checkLeftCar()
+    {
+        Debug.Log(queueÑars[0].name);
+        foreach (GameObject obj in leftObject)
+        {
+            if (queueÑars[0].name.Contains(obj.name))
+            {
+                Debug.Log(obj.name);
+                Debug.Log("Good!");
+                return;
+            }
+        }
+        Debug.Log("Loos!");
+    }
+
+    void checkCar(List<GameObject> RigLefObject)
+    {
+        string name1 = queueÑars[0].name.Remove(queueÑars[0].name.LastIndexOf("_"));
+        Debug.Log(name1);
+        foreach (GameObject obj in RigLefObject)
+        {
+            string name2 = obj.name.Remove(obj.name.IndexOf("(Clone"));
+            if (name1 == name2)
+            {
+                Debug.Log(obj.name);
+                Debug.Log("Good!");
+                sphere.GetComponent<MeshRenderer>().material = correctAnswer;
+                return;
+            }
+            Debug.Log(obj.name);
+        }
+        sphere.GetComponent<MeshRenderer>().material = wrongAnswer;
+        Debug.Log("Loos!");
+    }
+
+    public void refreshSphere()
+    {
+        sphere.GetComponent<MeshRenderer>().material = noneAnswer;
     }
 }

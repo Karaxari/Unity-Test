@@ -44,6 +44,12 @@ namespace PathCreation.Examples
             StartCoroutine(movingCar());
         }
 
+        public void reloadDistance()
+        {
+            distanceTravelled = 0f;
+        }
+
+
         IEnumerator movingCar()
         {
             float cof = distance / numStep;

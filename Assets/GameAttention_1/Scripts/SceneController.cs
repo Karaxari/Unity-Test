@@ -21,7 +21,9 @@ public class SceneController : MonoBehaviour
     int[] arrIndex = null;
     int[] oldArrIndex = null;
     int[] numbers = null;
-    
+
+    int correctAnswer;
+
 
     // Start is called before the first frame update
     void Start()
@@ -63,7 +65,16 @@ public class SceneController : MonoBehaviour
         Debug.Log(str1);
 
 
-        activeCube();
+        //activeCube();
+        numbers = ShuffleArray(numbers);
+        for (int i = 0; i < numCube; i++)
+        {
+            arrIndex[i] = numbers[i];
+            //Debug.Log(numbers[i]);
+            GameObject ob = (GameObject)allObjects[numbers[i]];
+            ob.GetComponent<MeshRenderer>().material = materials[1];
+        }
+        Debug.Log("---------------------------------");
     }
 
     // Update is called once per frame
@@ -74,16 +85,52 @@ public class SceneController : MonoBehaviour
 
     void activeCube()
     {
+        //numbers = ShuffleArray(numbers);
+        //for(int i=0; i<numCube; i++)
+        //{
+        //    arrIndex[i] = numbers[i];
+        //    //Debug.Log(numbers[i]);
+        //    GameObject ob = (GameObject)allObjects[numbers[i]];
+        //    ob.GetComponent<MeshRenderer>().material = materials[1];
+        //}
+        //Debug.Log("---------------------------------");
+
         numbers = ShuffleArray(numbers);
-        for(int i=0; i<numCube; i++)
+        int rand = Random.Range(0, numCube + 1);
+
+        correctAnswer = rand;
+
+        Debug.Log("---------------------------------");
+        Debug.Log("Правильный ответ: " + rand.ToString());
+        int i = 0;
+        while (rand > 0)
         {
-            arrIndex[i] = numbers[i];
-            //Debug.Log(numbers[i]);
-            GameObject ob = (GameObject)allObjects[numbers[i]];
+            if (checkArray(numbers[i])){
+                arrIndex[rand - 1] = numbers[i];
+                rand--;
+            }
+            i++;
+        }
+
+        for(int j = 0; j < numCube; j++)
+        {
+            GameObject ob = (GameObject)allObjects[arrIndex[j]];
             ob.GetComponent<MeshRenderer>().material = materials[1];
         }
-        Debug.Log("---------------------------------");
     }
+
+    bool checkArray(int n)
+    {
+        for (int i = 0; i < numCube; i++)
+        {
+            if (oldArrIndex[i] == n)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     void deactiveCube()
     {
@@ -124,27 +171,47 @@ public class SceneController : MonoBehaviour
 
     public void checkResult(int num)
     {
-        int col = 0;
-        for (int i = 0; i < numCube; i++)
-        {
-            for (int j = 0; j < numCube; j++)
-            {
-                if (oldArrIndex[i] == arrIndex[j])
-                {
-                    col++;
-                    break;
-                }
-            }
-        }
-        if (num == col)
-        {
-            Debug.Log("Good!");
+        //int col = 0;
+        //for (int i = 0; i < numCube; i++)
+        //{
+        //    for (int j = 0; j < numCube; j++)
+        //    {
+        //        if (oldArrIndex[i] == arrIndex[j])
+        //        {
+        //            col++;
+        //            break;
+        //        }
+        //    }
+        //}
+        //col = numCube - col;
+        //Debug.Log("Ответ программы: " + col.ToString());
+        //if (num == col)
+        //{
+        //    //Debug.Log("Good!");
+        //    sphere.GoodIndication();
+        //}
+        //else
+        //{
+        //    //Debug.Log("Loos!");
+        //    sphere.LossIndication();
+        //}
+
+
+        if (num == correctAnswer)
+        { 
             sphere.GoodIndication();
         }
         else
         {
-            Debug.Log("Loos!");
             sphere.LossIndication();
         }
+        string arr1 = "", arr2 = "";
+        for(int i = 0; i < numCube; i++)
+        {
+            arr1 = arr1 + arrIndex[i].ToString() + ", ";
+            arr2 = arr2 + oldArrIndex[i].ToString() + ", ";
+        }
+        Debug.Log("arrundex: " + arr1);
+        Debug.Log("oldArrIndex: " + arr2);
     }
 }
